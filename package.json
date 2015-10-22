@@ -1,0 +1,30 @@
+{
+  "name": "json-niftify",
+  "version": "0.0.0",
+  "description": "JSON stringification for humans",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodeunit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atesgoral/json-niftify.git"
+  },
+  "keywords": [
+    "json",
+    "stringify",
+    "serialize",
+    "format",
+    "reformat",
+    "beautify"
+  ],
+  "author": "Ates Goral <ates@magnetiq.com> (http://magnetiq.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atesgoral/json-niftify/issues"
+  },
+  "homepage": "https://github.com/atesgoral/json-niftify",
+  "devDependencies": {
+    "nodeunit": "^0.9.1"
+  }
+}
