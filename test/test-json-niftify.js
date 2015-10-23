@@ -10,7 +10,6 @@ exports.testSerializeNull = function (test) {
     test.done();
 };
 
-
 exports.testSerializeNumber = function (test) {
     test.strictEqual(niftify(42), '42');
     test.done();
@@ -27,3 +26,12 @@ exports.testSerializeBoolean = function (test) {
     test.done();
 };
 
+exports.testSerializeSingleLineArray = function (test) {
+    test.strictEqual(niftify([ 42, 'A' ]), '[ 42, "A" ]');
+    test.done();
+};
+
+exports.testSerializeSingleLineObject = function (test) {
+    test.strictEqual(niftify({ '0': 'A', B: 42 }), '{ "0": "A", "B": 42 }');
+    test.done();
+};
