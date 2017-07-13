@@ -35,3 +35,8 @@ exports.testSerializeSingleLineObject = function (test) {
     test.strictEqual(niftify({ '0': 'A', B: 42 }), '{ "0": "A", "B": 42 }');
     test.done();
 };
+
+exports.testSerializeMultiLineArray = function (test) {
+    test.strictEqual(niftify([ 42, 'A' ], { forceMultiLineArray: true, indent: '  ' }), '[\n  42,\n  "A"\n]');
+    test.done();
+};
