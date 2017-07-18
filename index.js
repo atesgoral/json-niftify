@@ -1,14 +1,14 @@
-var context = {
+const context = {
   create: function (props) {
-    return Object.create(this, props);
+    return Object.assign({}, this, props);
   },
   indent: function () {
-    return Object.create(this, {
+    return Object.assign({}, this, {
       indentation: this.indentation + this.config.indent
     });
   },
   singleLine: function () {
-    return Object.create(this, {
+    return Object.assign({}, this, {
       singleLine: true
     });
   }
@@ -25,55 +25,67 @@ function isSingleLineArray(v, context) {
 }
 
 function isSingleLineObject(v, context) {
+  if (context.config.forceMultiLineObject) {
+    return false;
+  }
+
   return true;
 }
 
-function multiLineArrayContents(v, context) {
-  //return
+function singleLineArrayContents(v, context) {
+  return ' ' + v.map((v) => niftify(v, context)).join(', ') + ' ';
 }
 
-//[ + \ni(1),\ni(2)\n + ] context.indent(v)?
+function multiLineArrayContents(v, context) {
+  return '\n' + context.indentation + v.map((v) => niftify(v, context)).join(',\n' + context.indentation ) + '\n'
+}
+
+function kvPair(k, v, context) {
+  return JSON.stringify(k) + ': ' + niftify(v, context);
+}
+
+function singleLineObjectContents(v, context) {
+  return ' ' + Object.keys(v).map((k) => kvPair(k, v[k], context)).join(', ') + ' ';
+}
+
+function multiLineObjectContents(v, context) {
+  return '\n' + context.indentation + Object.keys(v).map((k) => kvPair(k, v[k], context)).join(',\n' + context.indentation ) + '\n'
+}
 
 function arrayContents(v, context) {
   if (!v.length) {
     return '';
   }
 
-  // return isSingleLineArray(v, context) // context.isSingleLineArray(v)?
-  //     ? ' ' + v.map(JSON.stringify).join(', ') + ' '
-  //     : v.map(JSON.stringify).join(',\n' + context.indentation ) + '\n' + context.indentation;
   return isSingleLineArray(v, context) // context.isSingleLineArray(v)?
-    ? ' ' + v.map(JSON.stringify).join(', ') + ' '
-    : v.map(JSON.stringify).join(',\n' + context.indentation ) + '\n' + context.indentation;
-
-  context.singleLine()
-  context.indent()
+    ? singleLineArrayContents(v, context)
+    : multiLineArrayContents(v, context);
 }
 
 function objectContents(v, context) {
-  function kvPair(key) {
-    return '"' + key + '": ' + niftify(v[key], context);
-  }
-
   if (!Object.keys(v).length) {
     return '';
   }
 
   return isSingleLineObject(v, context)
-    ? ' ' + Object.keys(v).map(kvPair).join(', ') + ' '
-    : Object.keys(v).map(kvPair).join(','); // @tod
+    ? singleLineObjectContents(v, context)
+    : multiLineObjectContents(v, context);
 }
 
 function niftify(v, context) {
   if (v instanceof Array) {
-    return '[' + arrayContents(v, context) + ']';
+    return '[' + arrayContents(v, context.indent()) + ']';
   } else if (v instanceof Object) {
-    return '{' + objectContents(v, context) + '}';
+    return '{' + objectContents(v, context.indent()) + '}';
   } else {
     return JSON.stringify(v);
   }
 }
 
+const defaultConfig = {
+  indent: '  '
+};
+
 module.exports = function (v, config) {
-  return niftify(v, context.create({ config: config || {}, indentation: '' }));
+  return niftify(v, context.create({ config: Object.assign({}, defaultConfig, config), indentation: '' }));
 };
