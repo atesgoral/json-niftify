@@ -1,47 +1,52 @@
 var niftify = require('../index');
 
-exports.testSerializeUndefined = function (test) {
+exports.testUndefined = function (test) {
     test.strictEqual(niftify(undefined), undefined);
     test.done();
 };
 
-exports.testSerializeNull = function (test) {
+exports.testNull = function (test) {
     test.strictEqual(niftify(null), 'null');
     test.done();
 };
 
-exports.testSerializeNumber = function (test) {
+exports.testNumber = function (test) {
     test.strictEqual(niftify(42), '42');
     test.done();
 };
 
-exports.testSerializeString = function (test) {
+exports.testString = function (test) {
     test.strictEqual(niftify('A'), '"A"');
     test.done();
 };
 
-exports.testSerializeBoolean = function (test) {
+exports.testBoolean = function (test) {
     test.strictEqual(niftify(true), 'true');
     test.strictEqual(niftify(false), 'false');
     test.done();
 };
 
-exports.testSerializeSingleLineArray = function (test) {
+exports.testSingleLineArray = function (test) {
     test.strictEqual(niftify([ 42, 'A' ]), '[ 42, "A" ]');
     test.done();
 };
 
-exports.testSerializeSingleLineObject = function (test) {
+exports.testSingleLineObject = function (test) {
     test.strictEqual(niftify({ '0': 'A', B: 42 }), '{ "0": "A", "B": 42 }');
     test.done();
 };
 
-exports.testSerializeMultiLineArray = function (test) {
+exports.testForceMultiLineArray = function (test) {
     test.strictEqual(niftify([ 42, 'A' ], { forceMultiLineArray: true }), '[\n  42,\n  "A"\n]');
     test.done();
 };
 
-exports.testSerializeMultiLineObject = function (test) {
+exports.testForceMultiLineObject = function (test) {
     test.strictEqual(niftify({ '0': 'A', B: 42 }, { forceMultiLineObject: true }), '{\n  "0": "A",\n  "B": 42\n}');
     test.done();
 };
+
+// exports.testColumnLimit = function (test) {
+//     test.strictEqual(niftify([ 42, 'A' ], { maxColumns: 8 }), '[\n  42,\n  "A"\n]');
+//     test.done();
+// };

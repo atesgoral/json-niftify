@@ -4,7 +4,7 @@ const context = {
   },
   indent: function () {
     return Object.assign({}, this, {
-      indentation: this.indentation + this.config.indent
+      indentation: this.indentation + this.config.indentation
     });
   },
   singleLine: function () {
@@ -57,8 +57,16 @@ function arrayContents(v, context) {
     return '';
   }
 
+  const singleLineContents = singleLineArrayContents(v, context);
+
+  // if (context.config.maxColumns) {
+  //   if (singleLineContents.length + context.indentation.length <= context.config.maxColumns) {
+  //     return singleLineContents;
+  //   }
+  // }
+
   return isSingleLineArray(v, context) // context.isSingleLineArray(v)?
-    ? singleLineArrayContents(v, context)
+    ? singleLineContents
     : multiLineArrayContents(v, context);
 }
 
@@ -67,8 +75,16 @@ function objectContents(v, context) {
     return '';
   }
 
+  const singleLineContents = singleLineObjectContents(v, context);
+
+  // if (context.config.maxColumns) {
+  //   if (singleLineContents.length + context.indentation <= context.config.maxColumns) {
+  //     return singleLineContents;
+  //   }
+  // }
+
   return isSingleLineObject(v, context)
-    ? singleLineObjectContents(v, context)
+    ? singleLineContents
     : multiLineObjectContents(v, context);
 }
 
@@ -83,7 +99,7 @@ function niftify(v, context) {
 }
 
 const defaultConfig = {
-  indent: '  '
+  indentation: '  '
 };
 
 module.exports = function (v, config) {
