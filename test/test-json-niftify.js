@@ -98,7 +98,58 @@ exports.testComplexObject = function (test) {
     test.done();
 };
 
-// exports.testMaxColumns = function (test) {
-//     test.strictEqual(niftify([ 42, 'A' ], { maxColumns: 8 }), '[\n  42,\n  "A"\n]');
-//     test.done();
-// };
+exports.testArrayWithTooManyItems = function (test) {
+    test.strictEqual(niftify(
+[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11
+]
+    ),
+`[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11
+]`
+    );
+    test.done();
+};
+
+exports.testArrayWithTooManyProps = function (test) {
+    test.strictEqual(niftify(
+{
+  "a": 1,
+  "b": 2,
+  "c": 3,
+  "d": 4,
+  "e": 5,
+  "f": 6
+}
+    ),
+`{
+  "a": 1,
+  "b": 2,
+  "c": 3,
+  "d": 4,
+  "e": 5,
+  "f": 6
+}`
+    );
+    test.done();
+};

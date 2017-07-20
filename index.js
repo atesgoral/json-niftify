@@ -46,7 +46,7 @@ function stringify(ast, context) {
   } else if (typeof ast === 'string') {
     return ast;
   } else if (ast.items) {
-    if (ast.isPrimitive) {
+    if (ast.isPrimitive && context.config.maxItems && ast.items.length <= context.config.maxItems) {
        singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
        return singleLine;
     }
@@ -57,7 +57,7 @@ function stringify(ast, context) {
 ${stringifyItemsMultiLine(ast.items, childContext)}
 ${context.indentation}]`;
   } else if (ast.props) {
-    if (ast.isPrimitive) {
+    if (ast.isPrimitive && context.config.maxProps && ast.props.length <= context.config.maxProps) {
       singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
       return singleLine;
     }
@@ -77,7 +77,8 @@ function niftify(v, config) {
 const defaultConfig = {
   indentation: '  ',
   maxColumns: 80, // Set to 0 for unlimited
-  maxItems: 5 // Set to 0 for unlimited
+  maxItems: 10, // Set to 0 for unlimited
+  maxProps: 5 // Set to 0 for unlimited
 };
 
 module.exports = function (v, config) {
