@@ -1,107 +1,85 @@
-const context = {
-  create: function (props) {
-    return Object.assign({}, this, props);
-  },
-  indent: function () {
-    return Object.assign({}, this, {
-      indentation: this.indentation + this.config.indentation
-    });
-  },
-  singleLine: function () {
-    return Object.assign({}, this, {
-      singleLine: true
-    });
-  }
-};
+function astify(v, context) {
+  let ast = null;
 
-// If single line array/object, item values should be forced to be single line
-
-function isSingleLineArray(v, context) {
-  if (context.config.forceMultiLineArray) {
-    return false;
-  }
-
-  return true;
-}
-
-function isSingleLineObject(v, context) {
-  if (context.config.forceMultiLineObject) {
-    return false;
-  }
-
-  return true;
-}
-
-function singleLineArrayContents(v, context) {
-  return ' ' + v.map((v) => niftify(v, context)).join(', ') + ' ';
-}
-
-function multiLineArrayContents(v, context) {
-  return '\n' + context.indentation + v.map((v) => niftify(v, context)).join(',\n' + context.indentation ) + '\n'
-}
-
-function kvPair(k, v, context) {
-  return JSON.stringify(k) + ': ' + niftify(v, context);
-}
-
-function singleLineObjectContents(v, context) {
-  return ' ' + Object.keys(v).map((k) => kvPair(k, v[k], context)).join(', ') + ' ';
-}
-
-function multiLineObjectContents(v, context) {
-  return '\n' + context.indentation + Object.keys(v).map((k) => kvPair(k, v[k], context)).join(',\n' + context.indentation ) + '\n'
-}
-
-function arrayContents(v, context) {
-  if (!v.length) {
-    return '';
-  }
-
-  const singleLineContents = singleLineArrayContents(v, context);
-
-  // if (context.config.maxColumns) {
-  //   if (singleLineContents.length + context.indentation.length <= context.config.maxColumns) {
-  //     return singleLineContents;
-  //   }
-  // }
-
-  return isSingleLineArray(v, context) // context.isSingleLineArray(v)?
-    ? singleLineContents
-    : multiLineArrayContents(v, context);
-}
-
-function objectContents(v, context) {
-  if (!Object.keys(v).length) {
-    return '';
-  }
-
-  const singleLineContents = singleLineObjectContents(v, context);
-
-  // if (context.config.maxColumns) {
-  //   if (singleLineContents.length + context.indentation <= context.config.maxColumns) {
-  //     return singleLineContents;
-  //   }
-  // }
-
-  return isSingleLineObject(v, context)
-    ? singleLineContents
-    : multiLineObjectContents(v, context);
-}
-
-function niftify(v, context) {
   if (v instanceof Array) {
-    return '[' + arrayContents(v, context.indent()) + ']';
+    ast = {
+      items: v.map((v) => astify(v, context))
+    };
+    ast.isPrimitive = ast.items.every((item) => typeof item === 'string');
+    return ast;
   } else if (v instanceof Object) {
-    return '{' + objectContents(v, context.indent()) + '}';
+    ast = {
+      props: Object.keys(v).map((key) => Object.assign({ key, context }, { val: astify(v[key]) }))
+    };
+    ast.isPrimitive = ast.props.every((prop) => typeof prop.val === 'string');
+    return ast;
   } else {
     return JSON.stringify(v);
   }
 }
 
+function stringifyItemsSingleLine(items) {
+  return items.join(', ');
+}
+
+function stringifyItemsMultiLine(items, context) {
+  return context.indentation + items
+    .map((item) => stringify(item, context))
+    .join(',\n' + context.indentation);
+}
+
+function stringifyPropsSingleLine(props) {
+  return props.map((prop) => `${JSON.stringify(prop.key)}: ${prop.val}`).join(', ');
+}
+
+function stringifyPropsMultiLine(props, context) {
+  return context.indentation + props
+    .map((prop) => `${JSON.stringify(prop.key)}: ${stringify(prop.val, context)}`)
+    .join(',\n' + context.indentation);
+}
+
+function stringify(ast, context) {
+  let singleLine = null;
+
+  if (ast === undefined) {
+    return;
+  } else if (typeof ast === 'string') {
+    return ast;
+  } else if (ast.items) {
+    if (ast.isPrimitive) {
+       singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
+       return singleLine;
+    }
+
+    const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+
+    return `[
+${stringifyItemsMultiLine(ast.items, childContext)}
+${context.indentation}]`;
+  } else if (ast.props) {
+    if (ast.isPrimitive) {
+      singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
+      return singleLine;
+    }
+
+    const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+
+    return `{
+${stringifyPropsMultiLine(ast.props, childContext)}
+${context.indentation}}`;
+  }
+}
+
+function niftify(v, config) {
+  return stringify(astify(v), { indentation: '', config });
+}
+
 const defaultConfig = {
-  indentation: '  '
+  indentation: '  ',
+  maxColumns: 80, // Set to 0 for unlimited
+  maxItems: 5 // Set to 0 for unlimited
 };
 
 module.exports = function (v, config) {
-  return niftify(v, context.create({ config: Object.assign({}, defaultConfig, config), indentation: '' }));
+  return niftify(v, Object.assign({}, defaultConfig, config));
 };
