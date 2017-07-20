@@ -43,10 +43,20 @@ function stringifyPropsMultiLine(props, context) {
 function stringifyArray(ast, context) {
   if (ast.isPrimitive && context.config.maxItems && ast.items.length <= context.config.maxItems) {
     const singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
-    return singleLine;
+
+    if (singleLine.length + (context.parent ? context.parent.indentation.length : 0) <= context.config.maxColumns) {
+      return singleLine;
+    }
   }
 
-  const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+  const childContext = Object.assign(
+    {},
+    context,
+    {
+      parent: context,
+      indentation: context.indentation + context.config.indentation
+    }
+  );
 
   return `[
 ${stringifyItemsMultiLine(ast.items, childContext)}
@@ -56,10 +66,20 @@ ${context.indentation}]`;
 function stringifyObject(ast, context) {
   if (ast.isPrimitive && context.config.maxProps && ast.props.length <= context.config.maxProps) {
     const singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
-    return singleLine;
+
+    if (singleLine.length + (context.parent ? context.parent.indentation.length : 0) <= context.config.maxColumns) {
+      return singleLine;
+    }
   }
 
-  const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+  const childContext = Object.assign(
+    {},
+    context,
+    {
+      parent: context,
+      indentation: context.indentation + context.config.indentation
+    }
+  );
 
   return `{
 ${stringifyPropsMultiLine(ast.props, childContext)}

@@ -153,3 +153,49 @@ exports.testArrayWithTooManyProps = function (test) {
     );
     test.done();
 };
+
+exports.testArrayWithTooManyColumns = function (test) {
+    test.strictEqual(niftify(
+[
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789"
+]
+    ),
+`[
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789",
+  "0123456789"
+]`
+    );
+    test.done();
+};
+
+exports.testObjectWithTooManyColumns = function (test) {
+    test.strictEqual(niftify(
+{
+  "a": 1234567890123,
+  "b": 1234567890123,
+  "c": 1234567890123,
+  "d": 1234567890123
+}
+    ),
+`{
+  "a": 1234567890123,
+  "b": 1234567890123,
+  "c": 1234567890123,
+  "d": 1234567890123
+}`
+    );
+    test.done();
+};
