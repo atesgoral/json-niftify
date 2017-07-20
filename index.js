@@ -40,6 +40,32 @@ function stringifyPropsMultiLine(props, context) {
     .join(',\n' + context.indentation);
 }
 
+function stringifyArray(ast, context) {
+  if (ast.isPrimitive && context.config.maxItems && ast.items.length <= context.config.maxItems) {
+    const singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
+    return singleLine;
+  }
+
+  const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+
+  return `[
+${stringifyItemsMultiLine(ast.items, childContext)}
+${context.indentation}]`;
+}
+
+function stringifyObject(ast, context) {
+  if (ast.isPrimitive && context.config.maxProps && ast.props.length <= context.config.maxProps) {
+    const singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
+    return singleLine;
+  }
+
+  const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
+
+  return `{
+${stringifyPropsMultiLine(ast.props, childContext)}
+${context.indentation}}`;
+}
+
 function stringify(ast, context) {
   let singleLine = null;
 
@@ -48,27 +74,9 @@ function stringify(ast, context) {
   } else if (typeof ast === 'string') {
     return ast;
   } else if (ast.items) {
-    if (ast.isPrimitive && context.config.maxItems && ast.items.length <= context.config.maxItems) {
-       singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
-       return singleLine;
-    }
-
-    const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
-
-    return `[
-${stringifyItemsMultiLine(ast.items, childContext)}
-${context.indentation}]`;
+    return stringifyArray(ast, context);
   } else if (ast.props) {
-    if (ast.isPrimitive && context.config.maxProps && ast.props.length <= context.config.maxProps) {
-      singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
-      return singleLine;
-    }
-
-    const childContext = Object.assign({}, context, { indentation: context.indentation + context.config.indentation });
-
-    return `{
-${stringifyPropsMultiLine(ast.props, childContext)}
-${context.indentation}}`;
+    return stringifyObject(ast, context);
   }
 }
 
