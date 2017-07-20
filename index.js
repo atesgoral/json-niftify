@@ -1,3 +1,5 @@
+'use strict';
+
 function astify(v, context) {
   let ast = null;
 
