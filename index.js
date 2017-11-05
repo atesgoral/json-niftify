@@ -4,17 +4,13 @@ function astify(v, context) {
   let ast = null;
 
   if (v instanceof Array) {
-    ast = {
+    return {
       items: v.map((v) => astify(v, context))
     };
-    ast.isPrimitive = ast.items.every((item) => typeof item === 'string');
-    return ast;
   } else if (v instanceof Object) {
-    ast = {
+    return {
       props: Object.keys(v).map((key) => Object.assign({ key, context }, { val: astify(v[key]) }))
     };
-    ast.isPrimitive = ast.props.every((prop) => typeof prop.val === 'string');
-    return ast;
   } else {
     return JSON.stringify(v);
   }
@@ -41,7 +37,9 @@ function stringifyPropsMultiLine(props, context) {
 }
 
 function stringifyArray(ast, context) {
-  if (ast.isPrimitive && context.config.maxItems && ast.items.length <= context.config.maxItems) {
+  // const isPrimitive = ast.items.every((item) => typeof item === 'string');
+
+  if (context.config.maxItems && ast.items.length <= context.config.maxItems) {
     const singleLine = `[ ${stringifyItemsSingleLine(ast.items)} ]`;
 
     if (singleLine.length + (context.parent ? context.parent.indentation.length : 0) <= context.config.maxColumns) {
@@ -64,7 +62,9 @@ ${context.indentation}]`;
 }
 
 function stringifyObject(ast, context) {
-  if (ast.isPrimitive && context.config.maxProps && ast.props.length <= context.config.maxProps) {
+  // const isPrimitive = ast.props.every((prop) => typeof prop.val === 'string');
+
+  if (context.config.maxProps && ast.props.length <= context.config.maxProps) {
     const singleLine = `{ ${stringifyPropsSingleLine(ast.props)} }`;
 
     if (singleLine.length + (context.parent ? context.parent.indentation.length : 0) <= context.config.maxColumns) {
@@ -106,6 +106,8 @@ function niftify(v, config) {
 
 const defaultConfig = {
   indentation: '  ',
+  // singleLineOnlyPrimitive: false,
+  // singleLineOnlySameKind: false,
   maxColumns: 80, // Set to 0 for unlimited
   maxItems: 10, // Set to 0 for unlimited
   maxProps: 5 // Set to 0 for unlimited

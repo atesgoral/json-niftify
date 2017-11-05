@@ -167,6 +167,9 @@ exports.testArrayWithTooManyColumns = function (test) {
   "0123456789"
 ]
     ),
+/*
+[ "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789" ]
+*/
 `[
   "0123456789",
   "0123456789",
@@ -196,6 +199,104 @@ exports.testObjectWithTooManyColumns = function (test) {
   "c": 1234567890123,
   "d": 1234567890123
 }`
+    );
+    test.done();
+};
+
+exports.testNestedArrayWithJustRightAmountOfItemsAndColumns = function (test) {
+    test.strictEqual(niftify(
+{ "a": [ "0123456789", "0123456789", "0123456789", "0123456789", "012345678" ] }
+    ),
+`{ "a": [ "0123456789", "0123456789", "0123456789", "0123456789", "012345678" ] }`
+    );
+    test.done();
+};
+
+exports.testNestedObjectWithJustRightAmountOfItemsAndColumns = function (test) {
+    test.strictEqual(niftify(
+[ { "a": 12345678901, "b": 12345678901, "c": 12345678901, "d": 123456789012 } ]
+    ),
+`[ { "a": 12345678901, "b": 12345678901, "c": 12345678901, "d": 123456789012 } ]`
+    );
+    test.done();
+};
+
+exports.testNestedArrayWithTooManyColumns = function (test) {
+    test.strictEqual(niftify(
+{
+  "a": [
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789"
+  ]
+}
+    ),
+/*
+{ "a": [ "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789", "0123456789" ] }
+*/
+`{
+  "a": [
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789",
+    "0123456789"
+  ]
+}`
+    );
+    test.done();
+};
+
+exports.testNestedObjectWithTooManyColumns = function (test) {
+    test.strictEqual(niftify(
+[
+  {
+    "a": 1234567890123,
+    "b": 1234567890123,
+    "c": 1234567890123,
+    "d": 1234567890123
+  }
+]
+    ),
+`[
+  {
+    "a": 1234567890123,
+    "b": 1234567890123,
+    "c": 1234567890123,
+    "d": 1234567890123
+  }
+]`
+    );
+    test.done();
+};
+
+exports.testNestedObjectWithTooManyColumns = function (test) {
+    test.strictEqual(niftify(
+[
+  {
+    "a": 1234567890123,
+    "b": 1234567890123,
+    "c": 1234567890123,
+    "d": 1234567890123
+  }
+]
+    ),
+`[
+  {
+    "a": 1234567890123,
+    "b": 1234567890123,
+    "c": 1234567890123,
+    "d": 1234567890123
+  }
+]`
     );
     test.done();
 };
